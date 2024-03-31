@@ -1,29 +1,12 @@
 package ru.yandex.practicum.tasks;
 
-import ru.yandex.practicum.tasks.specifications.Status;
-import ru.yandex.practicum.tasks.specifications.Type;
-
 import java.util.Objects;
 
 public class Task {
-    protected final Type TYPE = Type.TASK;
-    protected int id;
-    protected String name;
-    protected String description;
-    protected Status status;
-
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        setStatus(Status.NEW);
-    }
-
-    public Task(int id, String name, String description, Status status) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
-    }
+    private int id;
+    private String name;
+    private String description;
+    private TaskStatus taskStatus;
 
     public void setId(int id) {
         this.id = id;
@@ -49,22 +32,26 @@ public class Task {
         this.description = description;
     }
 
-    public Status getStatus() {
-        return status;
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
-    public Type getTYPE() {
-        return TYPE;
+    public TaskType getTaskType() {
+        return TaskType.TASK;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task task)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task task)) {
+            return false;
+        }
         return getId() == task.getId();
     }
 
@@ -76,11 +63,11 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "TYPE=" + TYPE +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
+                "taskType=" + getTaskType() +
+                ", id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getTaskStatus() +
                 '}';
     }
 }
