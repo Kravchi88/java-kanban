@@ -18,7 +18,6 @@ public class Main {
         taskManager.createEpic(new Epic());
         taskManager.createSubtask(new Subtask());
 
-        System.out.println(taskManager.getAllTasks());
 
     }
 }

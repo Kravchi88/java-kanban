@@ -40,9 +40,6 @@ public class Task {
         this.status = status;
     }
 
-    public TaskType getType() {
-        return TaskType.TASK;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -63,7 +60,6 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "taskType=" + getType() +
                 ", id=" + getId() +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +

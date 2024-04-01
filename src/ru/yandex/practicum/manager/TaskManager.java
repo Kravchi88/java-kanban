@@ -1,9 +1,15 @@
 package ru.yandex.practicum.manager;
 
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.practicum.tasks.*;
+import ru.yandex.practicum.tasks.Epic;
+import ru.yandex.practicum.tasks.Subtask;
+import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.tasks.TaskStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TaskManager {
     private final Map<Integer, Task> tasks = new HashMap<>();
@@ -32,17 +38,21 @@ public class TaskManager {
 
         Epic epic = epics.get(subtask.getEpicId());
         epic.getSubtaskIds().add(subtask.getId());
-        epic.setStatus(changeEpicStatus(epic));
+        epic.setStatus(getEpicStatus(epic));
 
         return subtask;
     }
 
-    public List<Task> getAllTasks() {
-        List<Task> allTasks = new ArrayList<>();
-        allTasks.addAll(tasks.values());
-        allTasks.addAll(epics.values());
-        allTasks.addAll(subtasks.values());
-        return allTasks;
+    public List<Task> getTasks() {
+        return new ArrayList<>(tasks.values());
+    }
+
+    public List<Task> getEpics() {
+        return new ArrayList<>(epics.values());
+    }
+
+    public List<Task> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
     public void removeTasks() {
@@ -56,6 +66,10 @@ public class TaskManager {
 
     public void removeSubtasks() {
         subtasks.clear();
+        for (Epic epic : epics.values()) {
+            epic.getSubtaskIds().clear();
+            epic.setStatus(TaskStatus.NEW);
+        }
     }
 
     public Task getTaskById(int id) {
@@ -86,7 +100,7 @@ public class TaskManager {
         Subtask subtask = subtasks.get(id);
         Epic epic = epics.get(subtask.getEpicId());
         epic.getSubtaskIds().remove(Integer.valueOf(subtask.getId()));
-        epic.setStatus(changeEpicStatus(epic));
+        epic.setStatus(getEpicStatus(epic));
         subtasks.remove(subtask.getId());
     }
 
@@ -111,21 +125,22 @@ public class TaskManager {
 
         // change epic status
         Epic epic = epics.get(newSubtask.getEpicId());
-        epic.setStatus(changeEpicStatus(epic));
+        epic.setStatus(getEpicStatus(epic));
 
         return newSubtask;
     }
 
-    public List<Subtask> getSubtasksByEpic(Epic epic) {
-        List<Subtask> subtasksOfEpic = new ArrayList<>();
+    public List<Subtask> getSubtasksByEpicId(int epicId) {
+        List<Subtask> epicSubtasks = new ArrayList<>();
+        Epic epic = epics.get(epicId);
         for (int key : epic.getSubtaskIds()) {
-            subtasksOfEpic.add(subtasks.get(key));
+            epicSubtasks.add(subtasks.get(key));
         }
 
-        return subtasksOfEpic;
+        return epicSubtasks;
     }
 
-    private TaskStatus changeEpicStatus(Epic epic) {
+    private TaskStatus getEpicStatus(Epic epic) {
         TaskStatus[] subtaskStatuses = new TaskStatus[epic.getSubtaskIds().size()];
         int i = 0;
         for (int subtaskId : epic.getSubtaskIds()) {
