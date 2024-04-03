@@ -16,9 +16,9 @@ public interface TaskManager {
 
     List<Task> getTasks();
 
-    List<Task> getEpics();
+    List<Epic> getEpics();
 
-    List<Task> getSubtasks();
+    List<Subtask> getSubtasks();
 
     void removeTasks();
 
