@@ -5,7 +5,7 @@ import ru.yandex.practicum.tasks.Task;
 import java.util.List;
 
 public interface HistoryManager {
-    void addToSearchHistory(Task task);
+    void addToHistory(Task task);
 
     List<Task> getHistory();
 }

@@ -28,50 +28,36 @@ class TaskManagerTest {
     void beforeEach() {
         // Для каждого теста нужен новый менеджер, поэтому создаётся напрямую, а не через getDefault()
         taskManager = new InMemoryTaskManager();
+        // Для каждого теста будет и так новый менеджер, проверь
+        /*taskManager = Managers.getDefault();*/
+        // Проверил, тесты падают. В Managers.getDefault() new InMemoryTaskManager создаётся только один раз
 
-        // Без конструкторов конечно очень больно:((
-        task_1 = new Task();
-        task_1.setName("Feed the cat");
-        task_1.setDescription("-");
-        task_1.setStatus(TaskStatus.NEW);
+        task_1 = taskManager.setParametersToTask("Feed the cat", "-", TaskStatus.NEW);
         taskManager.createTask(task_1);
+        // Такого рода действия должны происходить в теле теста, а не в бефор-ич
 
-        epic_1 = new Epic();
-        epic_1.setName("Do the cleaning");
-        epic_1.setDescription("-");
-        epic_1.setSubtaskIds(new ArrayList<>());
+        /*Понимаю, но для многих тестов нужно заранее создать несколько тасков.
+        Если это не сделать здесь, это придётся делать в начале почти каждого теста.
+        Могу туда перенести, если делать так как сделал я моветон*/
+
+        epic_1 = taskManager.setParametersToEpic("Do the cleaning", "-", new ArrayList<>());
         taskManager.createEpic(epic_1);
 
-        subtask_1_1 = new Subtask();
-        subtask_1_1.setName("Vacuuming");
-        subtask_1_1.setDescription("-");
-        subtask_1_1.setStatus(TaskStatus.NEW);
-        subtask_1_1.setEpicId(2);
+        subtask_1_1 = taskManager.setParametersToSubtask("Vacuuming", "-", 2, TaskStatus.NEW);
         taskManager.createSubtask(subtask_1_1);
 
-        subtask_1_2 = new Subtask();
-        subtask_1_2.setName("Wash the floors");
-        subtask_1_2.setDescription("-");
-        subtask_1_2.setStatus(TaskStatus.NEW);
-        subtask_1_2.setEpicId(2);
+        subtask_1_2 = taskManager.setParametersToSubtask("Wash the floors", "-", 2, TaskStatus.NEW);
         taskManager.createSubtask(subtask_1_2);
 
-        epic_2 = new Epic();
-        epic_2.setName("Do the homework");
-        epic_2.setDescription("-");
-        epic_2.setSubtaskIds(new ArrayList<>());
+        epic_2 = taskManager.setParametersToEpic("Do the homework", "-", new ArrayList<>());
         taskManager.createEpic(epic_2);
 
-        subtask_2_1 = new Subtask();
-        subtask_2_1.setName("Write an essay");
-        subtask_2_1.setDescription("-");
-        subtask_2_1.setStatus(TaskStatus.NEW);
-        subtask_2_1.setEpicId(5);
+        subtask_2_1 = taskManager.setParametersToSubtask("Write an essay", "-", 5, TaskStatus.NEW);
         taskManager.createSubtask(subtask_2_1);
     }
 
     @Test
-    void shouldCreateTaskAndPutItToCollection() {
+    void createTask_shouldSaveTaskToMemory() {
         Task expectedTask = new Task();
         expectedTask.setId(7);
 
@@ -83,7 +69,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldCreateEpicAndPutItToCollection() {
+    void createEpic_shouldSaveEpicToMemory() {
         Epic expectedEpic = new Epic();
         expectedEpic.setId(7);
 
@@ -95,7 +81,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldCreateSubtaskAndUpdateEpic() {
+    void createSubtask_shouldSaveSubtaskToMemoryAndUpdateEpic() {
         Subtask expectedSubtask = new Subtask();
         expectedSubtask.setId(7);
 
@@ -114,22 +100,22 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldGetCorrectTaskById() {
+    void getTaskById_shouldGetCorrectTask() {
         assertEquals(task_1, taskManager.getTaskById(1), "The tasks are different");
     }
 
     @Test
-    void shouldGetCorrectEpicById() {
+    void getEpicById_shouldGetCorrectEpic() {
         assertEquals(epic_1, taskManager.getEpicById(2), "The epics are different");
     }
 
     @Test
-    void shouldGetCorrectSubtaskById() {
+    void getSubtaskById_shouldGetCorrectSubtask() {
         assertEquals(subtask_1_1, taskManager.getSubtaskById(3), "The subtasks are different");
     }
 
     @Test
-    void shouldGetCorrectTaskList() {
+    void getTasks_shouldGetCorrectList() {
         List<Task> expectedList = new ArrayList<>();
         expectedList.add(task_1);
 
@@ -140,7 +126,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldGetCorrectEpicList() {
+    void getEpics_shouldGetCorrectList() {
         List<Epic> expectedList = new ArrayList<>();
         expectedList.add(epic_1);
         expectedList.add(epic_2);
@@ -152,7 +138,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldGetCorrectSubtaskList() {
+    void getSubtasks_shouldGetCorrectList() {
         List<Subtask> expectedList = new ArrayList<>();
         expectedList.add(subtask_1_1);
         expectedList.add(subtask_1_2);
@@ -165,14 +151,14 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldRemoveTaskByIdAndReturnEmptyTaskList() {
+    void removeTaskById_shouldReturnTaskListWithoutThisTask() {
         taskManager.removeTaskById(1);
 
         assertEquals(0, taskManager.getTasks().size(), "The size of tasksList is wrong");
     }
 
     @Test
-    void shouldRemoveEpicByIdAndRemoveItsSubtasks() {
+    void removeEpicById_shouldRemoveEpicAndChildrenSubtasks() {
         taskManager.removeEpicById(2);
 
         assertEquals(1, taskManager.getEpics().size(), "The size of epicsList is wrong");
@@ -180,7 +166,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldRemoveSubtaskByIdAndUpdateEpicStatusIfDemanded() {
+    void removeSubtaskById_shouldRemoveSubtaskAndUpdateEpicStatusIfDemanded() {
         taskManager.removeSubtaskById(3);
 
         assertEquals(2, taskManager.getSubtasks().size(), "The size of subtasksList is wrong");
@@ -189,14 +175,14 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldRemoveAllTasksAndReturnEmptyList() {
+    void removeTasks_shouldReturnEmptyList() {
         taskManager.removeTasks();
 
         assertTrue(taskManager.getTasks().isEmpty(), "The task list is not empty");
     }
 
     @Test
-    void shouldRemoveAllEpicsAndReturnEmptyList() {
+    void removeEpics_shouldReturnEmptyEpicListAndSubtaskList() {
         taskManager.removeEpics();
 
         assertTrue(taskManager.getEpics().isEmpty(), "The epic list is not empty");
@@ -204,7 +190,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldRemoveAllSubtasksAndReturnEmptyList() {
+    void removeSubtasks_shouldReturnEmptySubtaskListAndSetStatusNEWToAllEpics() {
         taskManager.removeSubtasks();
 
         assertTrue(taskManager.getSubtasks().isEmpty(), "The subtask list is not empty");
@@ -212,7 +198,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldUpdateTaskName() {
+    void updateTask_shouldReturnTaskWithNewParameters() {
         assertEquals("Feed the cat", taskManager.getTaskById(1).getName()); // Проверка на старое значение
 
         Task newTask = new Task();
@@ -225,7 +211,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldUpdateEpicNameAndKeepItsSubtaskList() {
+    void updateEpic_shouldReturnEpicWithNewParametersAndKeepItsSubtaskList() {
         Epic newEpic = new Epic();
         newEpic.setId(2);
         newEpic.setName("Clean the room");
@@ -238,7 +224,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldUpdateSubtaskAndEpicStatus() {
+    void updateSubtask_shouldUpdateEpicStatusToDoneIfAllEpicSubtasksIsDone() {
         assertEquals(TaskStatus.NEW, epic_1.getStatus()); // Проверка на старое значение
 
         Subtask newSubtask1 = new Subtask();
@@ -265,7 +251,7 @@ class TaskManagerTest {
     }
 
     @Test
-    void shouldGetCorrectSubtaskListByEpicId() {
+    void getSubtasksByEpicId_shouldGetCorrectSubtaskList() {
         List<Subtask> expectedSubtaskList = List.of(subtask_1_1, subtask_1_2);
         List<Subtask> actualSubtaskList = taskManager.getSubtasksByEpicId(2);
 

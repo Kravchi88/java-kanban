@@ -50,19 +50,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        historyManager.addToSearchHistory(tasks.get(id));
+        historyManager.addToHistory(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        historyManager.addToSearchHistory(epics.get(id));
+        historyManager.addToHistory(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
-        historyManager.addToSearchHistory(subtasks.get(id));
+        historyManager.addToHistory(subtasks.get(id));
         return subtasks.get(id);
     }
 
@@ -157,8 +157,8 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Subtask> getSubtasksByEpicId(int epicId) {
         List<Subtask> epicSubtasks = new ArrayList<>();
         Epic epic = epics.get(epicId);
-        for (int key : epic.getSubtaskIds()) {
-            epicSubtasks.add(subtasks.get(key));
+        for (int subtaskId : epic.getSubtaskIds()) {
+            epicSubtasks.add(subtasks.get(subtaskId));
         }
 
         return epicSubtasks;
@@ -188,5 +188,30 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             return TaskStatus.IN_PROGRESS;
         }
+    }
+
+    public Task setParametersToTask(String name, String description, TaskStatus status) {
+        Task task = new Task();
+        task.setName(name);
+        task.setDescription(description);
+        task.setStatus(status);
+        return task;
+    }
+
+    public Epic setParametersToEpic(String name, String description, List<Integer> subtaskIds) {
+        Epic epic = new Epic();
+        epic.setName(name);
+        epic.setDescription(description);
+        epic.setSubtaskIds(subtaskIds);
+        return epic;
+    }
+
+    public Subtask setParametersToSubtask(String name, String description, int epicId, TaskStatus status) {
+        Subtask subtask = new Subtask();
+        subtask.setName(name);
+        subtask.setDescription(description);
+        subtask.setEpicId(epicId);
+        subtask.setStatus(status);
+        return subtask;
     }
 }

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.tasks.TaskStatus;
 
 import java.util.List;
 
@@ -45,4 +46,10 @@ public interface TaskManager {
     Subtask updateSubtask(@NotNull Subtask newSubtask);
 
     List<Subtask> getSubtasksByEpicId(int epicId);
+
+    Task setParametersToTask(String name, String description, TaskStatus status);
+
+    Epic setParametersToEpic(String name, String description, List<Integer> subtaskIds);
+
+    Subtask setParametersToSubtask(String name, String description, int epicId, TaskStatus status);
 }

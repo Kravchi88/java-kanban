@@ -6,18 +6,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> searchHistory = new LinkedList<>();
+    private final List<Task> history = new LinkedList<>();
+    private static final int MAX_CAPACITY = 10;
 
     @Override
-    public void addToSearchHistory(Task task) {
-        if (searchHistory.size() == 10) {
-            searchHistory.remove(0);
+    public void addToHistory(Task task) {
+        if (history.size() == MAX_CAPACITY) {
+            history.remove(0);
         }
-        searchHistory.add(task);
+        history.add(task);
     }
 
     @Override
     public List<Task> getHistory() {
-        return searchHistory;
+        return history;
     }
 }

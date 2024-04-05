@@ -1,12 +1,10 @@
 package ru.yandex.practicum.manager;
 
 public final class Managers {
-
-    private Managers() {
-    }
-
     private static TaskManager taskManager;
     private static HistoryManager historyManager;
+
+    private Managers() {}
 
     public static TaskManager getDefault() {
         if (taskManager == null) {
