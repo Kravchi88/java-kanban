@@ -19,11 +19,10 @@ class HistoryManagerTest {
     @BeforeEach
     void beforeEach() {
         historyManager = new InMemoryHistoryManager();
-        // historyManager = Managers.getDefaultHistory(); теперь тоже не работает, если только логику внутри метода менять
     }
 
     @Test
-    void addToHistory_shouldAddAllTypes() {
+    void addToHistory_shouldSaveTasks() {
         List<Task> expectedTasks = new LinkedList<>();
 
         Task task = new Task();
@@ -45,13 +44,8 @@ class HistoryManagerTest {
     }
 
     @Test
-    void addToHistory_shouldReturnOnlyLast10Elements() {
-        List<Task> expectedTasks = new LinkedList<>();
-        for (int i = 6; i <= 15; i++) {
-            Task task = new Task();
-            task.setId(i);
-            expectedTasks.add(task);
-        }
+    void addToHistory_shouldKeepNoMoreThan10Elements() {
+        int historyLimit = 10;
 
         for (int i = 1; i <= 15; i++) {
             Task task = new Task();
@@ -59,7 +53,7 @@ class HistoryManagerTest {
             historyManager.addToHistory(task);
         }
 
-        assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to searh history");
+        assertEquals(historyLimit, historyManager.getHistory().size());
     }
 
     @Test

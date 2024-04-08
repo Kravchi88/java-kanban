@@ -189,29 +189,4 @@ public class InMemoryTaskManager implements TaskManager {
             return TaskStatus.IN_PROGRESS;
         }
     }
-
-    public Task setParametersToTask(String name, String description, TaskStatus status) {
-        Task task = new Task();
-        task.setName(name);
-        task.setDescription(description);
-        task.setStatus(status);
-        return task;
-    }
-
-    public Epic setParametersToEpic(String name, String description, List<Integer> subtaskIds) {
-        Epic epic = new Epic();
-        epic.setName(name);
-        epic.setDescription(description);
-        epic.setSubtaskIds(subtaskIds);
-        return epic;
-    }
-
-    public Subtask setParametersToSubtask(String name, String description, int epicId, TaskStatus status) {
-        Subtask subtask = new Subtask();
-        subtask.setName(name);
-        subtask.setDescription(description);
-        subtask.setEpicId(epicId);
-        subtask.setStatus(status);
-        return subtask;
-    }
 }
