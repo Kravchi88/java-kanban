@@ -7,17 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T> {
-    private final Map<Integer, Node<T>> history = new HashMap<>();
-    private Node<T> head;
-    private Node<T> tail;
+public class InMemoryHistoryManager implements HistoryManager {
+    private final Map<Integer, Node<Task>> history = new HashMap<>();
+    private Node<Task> head;
+    private Node<Task> tail;
 
     @Override
-    public void addToHistory(T instance) {
-        if (history.containsKey(instance.getId())) {
-            removeFromHistory(instance.getId());
+    public void addToHistory(Task task) {
+        if (history.containsKey(task.getId())) {
+            removeFromHistory(task.getId());
         }
-        linkLast(instance);
+        linkLast(task);
     }
 
     @Override
@@ -26,25 +26,25 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
     }
 
     @Override
-    public List<T> getHistory() {
+    public List<Task> getHistory() {
         return getTasks();
     }
 
-    private void linkLast(T instance) {
-        Node<T> oldTail = tail;
-        Node<T> newNode = new Node<>(oldTail, null, instance);
+    private void linkLast(Task task) {
+        Node<Task> oldTail = tail;
+        Node<Task> newNode = new Node<>(oldTail, null, task);
         tail = newNode;
         if (oldTail == null) {
             head = newNode;
         } else {
             oldTail.next = newNode;
         }
-        history.put(instance.getId(), newNode);
+        history.put(task.getId(), newNode);
     }
 
-    private List<T> getTasks() {
-        List<T> list = new ArrayList<>();
-        Node<T> node = head;
+    private List<Task> getTasks() {
+        List<Task> list = new ArrayList<>();
+        Node<Task> node = head;
         while (node != null) {
             list.add(node.instance);
             node = node.next;
@@ -52,12 +52,30 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         return list;
     }
 
-    private void removeNode(Node<T> node) {
+    private void removeNode(Node<Task> node) {
+        if (head == tail) {
+            head = null;
+            tail = null;
+            return;
+        }
+
+        if (node == head) {
+            head = head.next;
+            head.prev = null;
+            return;
+        }
+
+        if (node == tail) {
+            tail = tail.prev;
+            tail.next = null;
+            return;
+        }
+
         node.prev.next = node.next;
         node.next.prev = node.prev;
     }
 
-    class Node<E> {
+    static class Node<E> {
         Node<E> prev;
         Node<E> next;
         E instance;

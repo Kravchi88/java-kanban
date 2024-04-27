@@ -6,7 +6,7 @@ import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +23,7 @@ class HistoryManagerTest {
 
     @Test
     void addToHistory_shouldSaveTasks() {
-        List<Task> expectedTasks = new LinkedList<>();
+        List<Task> expectedTasks = new ArrayList<>();
 
         Task task = new Task();
         task.setId(1);
@@ -40,20 +40,26 @@ class HistoryManagerTest {
         expectedTasks.add(subtask);
         historyManager.addToHistory(subtask);
 
-        assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to searh history");
+        assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to search history");
     }
 
     @Test
-    void addToHistory_shouldKeepNoMoreThan10Elements() {
-        int historyLimit = 10;
+    void addToHistory_shouldNotAddDuplicates() {
+        List<Task> expectedTasks = new ArrayList<>();
 
-        for (int i = 1; i <= 15; i++) {
-            Task task = new Task();
-            task.setId(i);
-            historyManager.addToHistory(task);
-        }
+        Task task1 = new Task();
+        task1.setId(1);
+        Task task2 = new Task();
+        task2.setId(2);
 
-        assertEquals(historyLimit, historyManager.getHistory().size());
+        expectedTasks.add(task2);
+        expectedTasks.add(task1);
+
+        historyManager.addToHistory(task1);
+        historyManager.addToHistory(task2);
+        historyManager.addToHistory(task1);
+
+        assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to search history");
     }
 
     @Test
