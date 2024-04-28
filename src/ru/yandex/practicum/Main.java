@@ -34,7 +34,6 @@ public class Main {
         taskManager.getSubtaskById(5);
         taskManager.getSubtaskById(6);
 
-
         System.out.println(taskManager.getHistoryManager().getHistory());
 
         taskManager.removeTaskById(1);
