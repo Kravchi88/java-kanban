@@ -25,20 +25,17 @@ class HistoryManagerTest {
     void addToHistory_shouldSaveTasks() {
         List<Task> expectedTasks = new ArrayList<>();
 
-        Task task = new Task();
-        task.setId(1);
+        Task task = task(1);
         expectedTasks.add(task);
-        historyManager.addToHistory(task);
+        historyManager.add(task);
 
-        Epic epic = new Epic();
-        epic.setId(2);
+        Epic epic = epic(2);
         expectedTasks.add(epic);
-        historyManager.addToHistory(epic);
+        historyManager.add(epic);
 
-        Subtask subtask = new Subtask();
-        subtask.setId(3);
+        Subtask subtask = subtask(3, 2);
         expectedTasks.add(subtask);
-        historyManager.addToHistory(subtask);
+        historyManager.add(subtask);
 
         assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to search history");
     }
@@ -47,17 +44,15 @@ class HistoryManagerTest {
     void addToHistory_shouldNotAddDuplicates() {
         List<Task> expectedTasks = new ArrayList<>();
 
-        Task task1 = new Task();
-        task1.setId(1);
-        Task task2 = new Task();
-        task2.setId(2);
+        Task task1 = task(1);
+        Task task2 = task(2);
 
         expectedTasks.add(task2);
         expectedTasks.add(task1);
 
-        historyManager.addToHistory(task1);
-        historyManager.addToHistory(task2);
-        historyManager.addToHistory(task1);
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task1);
 
         assertEquals(expectedTasks, historyManager.getHistory(), "Wrong addition to search history");
     }
@@ -65,5 +60,24 @@ class HistoryManagerTest {
     @Test
     void getHistory_shouldNotReturnNull() {
         assertNotNull(historyManager.getHistory(), "Search history does not exist");
+    }
+
+    Task task(int id) {
+        Task task = new Task();
+        task.setId(id);
+        return task;
+    }
+
+    Epic epic(int id) {
+        Epic epic = new Epic();
+        epic.setId(id);
+        return epic;
+    }
+
+    Subtask subtask(int id, int epicId) {
+        Subtask subtask = new Subtask();
+        subtask.setId(id);
+        subtask.setEpicId(epicId);
+        return subtask;
     }
 }
