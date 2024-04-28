@@ -1,6 +1,5 @@
 package ru.yandex.practicum.manager;
 
-import org.jetbrains.annotations.NotNull;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -10,11 +9,11 @@ import java.util.List;
 public interface TaskManager {
     HistoryManager getHistoryManager();
 
-    Task createTask(@NotNull Task task);
+    Task createTask(Task task);
 
-    Epic createEpic(@NotNull Epic epic);
+    Epic createEpic(Epic epic);
 
-    Subtask createSubtask(@NotNull Subtask subtask);
+    Subtask createSubtask(Subtask subtask);
 
     Task getTaskById(int id);
 
@@ -40,11 +39,11 @@ public interface TaskManager {
 
     void removeSubtasks();
 
-    Task updateTask(@NotNull Task newTask);
+    Task updateTask(Task newTask);
 
-    Epic updateEpic(@NotNull Epic newEpic);
+    Epic updateEpic(Epic newEpic);
 
-    Subtask updateSubtask(@NotNull Subtask newSubtask);
+    Subtask updateSubtask(Subtask newSubtask);
 
     List<Subtask> getSubtasksByEpicId(int epicId);
 }

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.manager;
 
-import org.jetbrains.annotations.NotNull;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -26,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task createTask(@NotNull Task task) {
+    public Task createTask(Task task) {
         task.setId(++idSequence);
         tasks.put(idSequence, task);
 
@@ -34,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic createEpic(@NotNull Epic epic) {
+    public Epic createEpic(Epic epic) {
         epic.setId(++idSequence);
         epics.put(idSequence, epic);
 
@@ -42,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask createSubtask(@NotNull Subtask subtask) {
+    public Subtask createSubtask(Subtask subtask) {
         subtask.setId(++idSequence);
         subtasks.put(idSequence, subtask);
 
@@ -146,14 +145,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(@NotNull Task newTask) {
+    public Task updateTask(Task newTask) {
         tasks.put(newTask.getId(), newTask);
 
         return newTask;
     }
 
     @Override
-    public Epic updateEpic(@NotNull Epic newEpic) {
+    public Epic updateEpic(Epic newEpic) {
         Epic oldEpic = epics.get(newEpic.getId());
         newEpic.setSubtaskIds(oldEpic.getSubtaskIds());
         epics.put(newEpic.getId(), newEpic);
@@ -162,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask updateSubtask(@NotNull Subtask newSubtask) {
+    public Subtask updateSubtask(Subtask newSubtask) {
         Subtask oldSubtask = subtasks.get(newSubtask.getId());
         newSubtask.setEpicId(oldSubtask.getEpicId());
         subtasks.put(newSubtask.getId(), newSubtask);
