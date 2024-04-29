@@ -7,7 +7,7 @@ import ru.yandex.practicum.tasks.Task;
 import java.util.List;
 
 public interface TaskManager {
-    HistoryManager getHistoryManager();
+    List<Task> getHistory();
 
     Task createTask(Task task);
 

@@ -34,11 +34,11 @@ public class Main {
         taskManager.getSubtaskById(5);
         taskManager.getSubtaskById(6);
 
-        System.out.println(taskManager.getHistoryManager().getHistory());
+        System.out.println(taskManager.getHistory());
 
         taskManager.removeTaskById(1);
         taskManager.removeEpicById(3);
 
-        System.out.println(taskManager.getHistoryManager().getHistory());
+        System.out.println(taskManager.getHistory());
     }
 }

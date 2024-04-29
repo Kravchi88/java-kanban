@@ -62,19 +62,19 @@ class HistoryManagerTest {
         assertNotNull(historyManager.getHistory(), "Search history does not exist");
     }
 
-    Task task(int id) {
+    private Task task(int id) {
         Task task = new Task();
         task.setId(id);
         return task;
     }
 
-    Epic epic(int id) {
+    private Epic epic(int id) {
         Epic epic = new Epic();
         epic.setId(id);
         return epic;
     }
 
-    Subtask subtask(int id, int epicId) {
+    private Subtask subtask(int id, int epicId) {
         Subtask subtask = new Subtask();
         subtask.setId(id);
         subtask.setEpicId(epicId);

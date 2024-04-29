@@ -20,8 +20,8 @@ public class InMemoryTaskManager implements TaskManager {
     private int idSequence = 0;
 
     @Override
-    public HistoryManager getHistoryManager() {
-        return historyManager;
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     @Override
