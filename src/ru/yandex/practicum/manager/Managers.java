@@ -4,7 +4,8 @@ public final class Managers {
     private static TaskManager taskManager;
     private static HistoryManager historyManager;
 
-    private Managers() {}
+    private Managers() {
+    }
 
     public static TaskManager getDefault() {
         if (taskManager == null) {

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.manager;
 
-import org.jetbrains.annotations.NotNull;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -21,7 +20,12 @@ public class InMemoryTaskManager implements TaskManager {
     private int idSequence = 0;
 
     @Override
-    public Task createTask(@NotNull Task task) {
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
+    @Override
+    public Task createTask(Task task) {
         task.setId(++idSequence);
         tasks.put(idSequence, task);
 
@@ -29,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic createEpic(@NotNull Epic epic) {
+    public Epic createEpic(Epic epic) {
         epic.setId(++idSequence);
         epics.put(idSequence, epic);
 
@@ -37,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask createSubtask(@NotNull Subtask subtask) {
+    public Subtask createSubtask(Subtask subtask) {
         subtask.setId(++idSequence);
         subtasks.put(idSequence, subtask);
 
@@ -50,19 +54,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        historyManager.addToHistory(tasks.get(id));
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        historyManager.addToHistory(epics.get(id));
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
-        historyManager.addToHistory(subtasks.get(id));
+        historyManager.add(subtasks.get(id));
         return subtasks.get(id);
     }
 
@@ -84,6 +88,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskById(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -91,8 +96,10 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         for (int subtaskId : epic.getSubtaskIds()) {
             subtasks.remove(subtaskId);
+            historyManager.remove(subtaskId);
         }
         epics.remove(epic.getId());
+        historyManager.remove(id);
     }
 
     @Override
@@ -102,21 +109,26 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtaskIds().remove(Integer.valueOf(subtask.getId()));
         epic.setStatus(getEpicStatus(epic));
         subtasks.remove(subtask.getId());
+        historyManager.remove(id);
     }
 
     @Override
     public void removeTasks() {
+        tasks.keySet().forEach(historyManager::remove);
         tasks.clear();
     }
 
     @Override
     public void removeEpics() {
+        epics.keySet().forEach(historyManager::remove);
+        subtasks.keySet().forEach(historyManager::remove);
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void removeSubtasks() {
+        subtasks.keySet().forEach(historyManager::remove);
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
@@ -125,14 +137,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(@NotNull Task newTask) {
+    public Task updateTask(Task newTask) {
         tasks.put(newTask.getId(), newTask);
 
         return newTask;
     }
 
     @Override
-    public Epic updateEpic(@NotNull Epic newEpic) {
+    public Epic updateEpic(Epic newEpic) {
         Epic oldEpic = epics.get(newEpic.getId());
         newEpic.setSubtaskIds(oldEpic.getSubtaskIds());
         epics.put(newEpic.getId(), newEpic);
@@ -141,7 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask updateSubtask(@NotNull Subtask newSubtask) {
+    public Subtask updateSubtask(Subtask newSubtask) {
         Subtask oldSubtask = subtasks.get(newSubtask.getId());
         newSubtask.setEpicId(oldSubtask.getEpicId());
         subtasks.put(newSubtask.getId(), newSubtask);
