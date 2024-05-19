@@ -1,44 +1,36 @@
 package ru.yandex.practicum;
 
-import ru.yandex.practicum.manager.Managers;
-import ru.yandex.practicum.manager.TaskManager;
+import ru.yandex.practicum.manager.FileBackedTaskManager;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
+import ru.yandex.practicum.tasks.TaskStatus;
+
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
 
-        TaskManager taskManager = Managers.getDefault();
+        File file = new File("data.csv");
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
 
-        Task task1 = taskManager.createTask(new Task());
-        Task task2 = taskManager.createTask(new Task());
-        Epic epic1 = taskManager.createEpic(new Epic());
+        Task task = new Task();
+        task.setName("task2");
+        task.setStatus(TaskStatus.NEW);
+        task.setDescription("Base task description");
+        manager.createTask(task);
+
+        Epic epic = new Epic();
+        epic.setName("epic2");
+        epic.setDescription("Base epic description");
+        manager.createEpic(epic);
+
         Subtask subtask1 = new Subtask();
-        subtask1.setEpicId(3);
-        taskManager.createSubtask(subtask1);
-        Subtask subtask2 = new Subtask();
-        subtask2.setEpicId(3);
-        taskManager.createSubtask(subtask2);
-        Subtask subtask3 = new Subtask();
-        subtask3.setEpicId(3);
-        taskManager.createSubtask(subtask3);
-        Epic epic2 = taskManager.createEpic(new Epic());
+        subtask1.setName("subtask2");
+        subtask1.setDescription("Base subtask description");
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        subtask1.setEpicId(2);
+        manager.createSubtask(subtask1);
 
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(3);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
-        taskManager.getSubtaskById(4);
-        taskManager.getSubtaskById(5);
-        taskManager.getSubtaskById(6);
-
-        System.out.println(taskManager.getHistory());
-
-        taskManager.removeTaskById(1);
-        taskManager.removeEpicById(3);
-
-        System.out.println(taskManager.getHistory());
     }
 }
