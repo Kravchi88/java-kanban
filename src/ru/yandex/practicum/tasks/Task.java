@@ -40,6 +40,26 @@ public class Task {
         this.status = status;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
+    public String toCsvLine() {
+        return String.join(",", new String[]{String.valueOf(this.getId()), String.valueOf(this.getType()),
+                this.getName(), String.valueOf(this.getStatus()), this.getDescription()});
+    }
+
+    public Task fromCsvLine(String[] taskData) {
+        this.setId(Integer.parseInt(taskData[0]));
+        this.setName(taskData[2]);
+        switch (taskData[3]) {
+            case "NEW" -> this.setStatus(TaskStatus.NEW);
+            case "IN_PROGRESS" -> this.setStatus(TaskStatus.IN_PROGRESS);
+            case "DONE" -> this.setStatus(TaskStatus.DONE);
+        }
+        this.setDescription(taskData[4]);
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
