@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Epic extends Task {
     private List<Integer> subtaskIds = new ArrayList<>();
-    private final TaskType type = TaskType.EPIC;
 
     public void setSubtaskIds(List<Integer> subtaskIds) {
         this.subtaskIds = subtaskIds;
@@ -18,7 +17,7 @@ public class Epic extends Task {
 
     @Override
     public TaskType getType() {
-        return type;
+        return TaskType.EPIC;
     }
 
     @Override
