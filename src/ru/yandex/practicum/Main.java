@@ -11,7 +11,7 @@ import java.io.File;
 public class Main {
     public static void main(String[] args) {
 
-        File file = new File("data.csv");
+        File file = new File("resources/data.csv");
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
 
         Task task = new Task();

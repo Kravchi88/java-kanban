@@ -7,20 +7,16 @@ import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 import ru.yandex.practicum.tasks.TaskStatus;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class FileBackedTaskManagerTest {
-    TaskManager taskManager;
-    Path path = Paths.get("test/files/test.csv");
+class FileBackedTaskManagerTest {
+    private TaskManager taskManager;
+    private final Path path = Paths.get("test/files/test.csv");
 
     @BeforeEach
     void beforeEach() {
@@ -28,64 +24,45 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    void shouldSerializeTasks() {
+    void shouldSerializeTasks() throws IOException {
         File expected = new File("test/files/expectedSerialize.csv");
         File actual = new File("test/files/actualSerialize.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager("test/files/actualSerialize.csv");
 
-        try (FileWriter writer = new FileWriter(expected)) {
-            writer.write("1,TASK,Task1,NEW,Description task1\n" +
-                    "2,EPIC,Epic2,DONE,Description epic2\n" +
-                    "3,SUBTASK,Sub Task2,DONE,Description sub task3,2");
-        } catch (IOException e) {
-            System.out.println("Exception");
-        }
+        FileWriter writerExpected = new FileWriter(expected);
+        writerExpected.write("1,TASK,Task1,NEW,Description task1\n" +
+                "2,EPIC,Epic2,DONE,Description epic2\n" +
+                "3,SUBTASK,Sub Task2,DONE,Description sub task3,2");
 
-        try (FileWriter writer = new FileWriter(actual)) {
-            writer.write(manager.toString(task()) + "\n");
-            writer.write(manager.toString(epic()) + "\n");
-            writer.write(manager.toString(subtask()) + "\n");
-        } catch (IOException e) {
-            System.out.println("Exception");
-        }
+        FileWriter writerActual = new FileWriter(actual);
+        writerActual.write(task().toCsvLine() + "\n");
+        writerActual.write(epic().toCsvLine() + "\n");
+        writerActual.write(subtask().toCsvLine() + "\n");
 
         StringBuilder expectedString = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(expected))) {
-            while (bufferedReader.ready()) {
-                expectedString.append(bufferedReader.readLine());
-            }
-        } catch (IOException e){
-            System.out.println("Exception");
+        BufferedReader bufferedReaderExpected = new BufferedReader(new FileReader(expected));
+        while (bufferedReaderExpected.ready()) {
+            expectedString.append(bufferedReaderExpected.readLine());
         }
 
         StringBuilder actualString = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(actual))) {
-            while (bufferedReader.ready()) {
-                actualString.append(bufferedReader.readLine());
-            }
-        } catch (IOException e) {
-            System.out.println("Exception");
+        BufferedReader bufferedReaderActual = new BufferedReader(new FileReader(actual));
+        while (bufferedReaderActual.ready()) {
+            actualString.append(bufferedReaderActual.readLine());
         }
 
         assertEquals(expectedString.toString(), actualString.toString());
     }
 
     @Test
-    void shouldDeserializeTasks() {
+    void shouldDeserializeTasks() throws IOException {
         File file = new File("test/files/fileToRead.csv");
         FileBackedTaskManager manager = new FileBackedTaskManager("test/files/fileToRead.csv");
 
-        Task actualTask = null;
-        Epic actualEpic = null;
-        Subtask actualSubtask = null;
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            actualTask = manager.fromString(bufferedReader.readLine());
-            actualEpic = (Epic) manager.fromString(bufferedReader.readLine());
-            actualSubtask = (Subtask) manager.fromString(bufferedReader.readLine());
-        } catch (IOException e) {
-            System.out.println("Exception");
-        }
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        Task actualTask = manager.fromString(bufferedReader.readLine());
+        Epic actualEpic = (Epic) manager.fromString(bufferedReader.readLine());
+        Subtask actualSubtask = (Subtask) manager.fromString(bufferedReader.readLine());
 
         assertEquals(task(), actualTask);
         assertEquals(epic(), actualEpic);

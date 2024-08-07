@@ -52,11 +52,7 @@ public class Task {
     public Task fromCsvLine(String[] taskData) {
         this.setId(Integer.parseInt(taskData[0]));
         this.setName(taskData[2]);
-        switch (taskData[3]) {
-            case "NEW" -> this.setStatus(TaskStatus.NEW);
-            case "IN_PROGRESS" -> this.setStatus(TaskStatus.IN_PROGRESS);
-            case "DONE" -> this.setStatus(TaskStatus.DONE);
-        }
+        this.setStatus(TaskStatus.valueOf(taskData[3]));
         this.setDescription(taskData[4]);
         return this;
     }

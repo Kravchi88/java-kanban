@@ -24,16 +24,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
             writer.write("id,type,name,status,description,epic\n");
             for (Task task : tasks.values()) {
-                writer.write(toString(task) + "\n");
+                writer.write(task.toCsvLine() + "\n");
             }
             for (Epic epic : epics.values()) {
-                writer.write(toString(epic) + "\n");
+                writer.write(epic.toCsvLine() + "\n");
             }
             for (Subtask subtask : subtasks.values()) {
-                writer.write(toString(subtask) + "\n");
+                writer.write(subtask.toCsvLine() + "\n");
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при записи в файл");
+            throw new ManagerSaveException("Error writing to file");
         }
     }
 
@@ -60,15 +60,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при чтении из файла");
+            throw new ManagerSaveException("Error reading from file");
         } finally {
             manager.idSequence = assignableId;
         }
         return manager;
-    }
-
-    String toString(Task task) {
-        return task.toCsvLine();
     }
 
     Task fromString(String value) {
@@ -86,7 +82,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Subtask subtask = new Subtask();
                 return subtask.fromCsvLine(taskData);
             }
-            default -> throw new ManagerSaveException("Некорректный тип задачи");
+            default -> throw new ManagerSaveException("Invalid task type");
         }
     }
 
