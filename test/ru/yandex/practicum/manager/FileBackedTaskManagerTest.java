@@ -10,6 +10,8 @@ import ru.yandex.practicum.tasks.TaskStatus;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,14 +32,16 @@ class FileBackedTaskManagerTest {
         FileBackedTaskManager manager = new FileBackedTaskManager("test/files/actualSerialize.csv");
 
         FileWriter writerExpected = new FileWriter(expected);
-        writerExpected.write("1,TASK,Task1,NEW,Description task1\n" +
-                "2,EPIC,Epic2,DONE,Description epic2\n" +
-                "3,SUBTASK,Sub Task2,DONE,Description sub task3,2");
+        writerExpected.write("1,TASK,Task1,NEW,Description task1,30,2024-08-31T10:30\n" +
+                "2,EPIC,Epic2,DONE,Description epic2,10,2024-08-31T11:00\n" +
+                "3,SUBTASK,Sub Task2,DONE,Description sub task3,10,2024-08-31T11:00,2");
+        writerExpected.close();
 
         FileWriter writerActual = new FileWriter(actual);
         writerActual.write(task().toCsvLine() + "\n");
         writerActual.write(epic().toCsvLine() + "\n");
         writerActual.write(subtask().toCsvLine() + "\n");
+        writerActual.close();
 
         StringBuilder expectedString = new StringBuilder();
         BufferedReader bufferedReaderExpected = new BufferedReader(new FileReader(expected));
@@ -75,6 +79,8 @@ class FileBackedTaskManagerTest {
         task.setName("Task1");
         task.setDescription("Description task1");
         task.setStatus(TaskStatus.NEW);
+        task.setDuration(Duration.ofMinutes(30));
+        task.setStartTime(LocalDateTime.of(2024,8, 31, 10, 30));
         return task;
     }
 
@@ -84,6 +90,8 @@ class FileBackedTaskManagerTest {
         epic.setName("Epic2");
         epic.setDescription("Description epic2");
         epic.setStatus(TaskStatus.DONE);
+        epic.setDuration(Duration.ofMinutes(10));
+        epic.setStartTime(LocalDateTime.of(2024,8, 31, 11,0));
         return epic;
     }
 
@@ -94,6 +102,8 @@ class FileBackedTaskManagerTest {
        subtask.setDescription("Description sub task3");
        subtask.setStatus(TaskStatus.DONE);
        subtask.setEpicId(2);
+       subtask.setDuration(Duration.ofMinutes(10));
+       subtask.setStartTime(LocalDateTime.of(2024,8, 31, 11,0));
        return subtask;
     }
 }

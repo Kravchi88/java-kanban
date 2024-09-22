@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,6 +9,8 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus status;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public void setId(int id) {
         this.id = id;
@@ -40,13 +44,44 @@ public class Task {
         this.status = status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (duration != null && startTime != null) {
+            return startTime.plusMinutes(duration.toMinutes());
+        } else {
+            return null;
+        }
+    }
+
     public TaskType getType() {
         return TaskType.TASK;
     }
 
     public String toCsvLine() {
-        return String.join(",", new String[]{String.valueOf(this.getId()), String.valueOf(this.getType()),
-                this.getName(), String.valueOf(this.getStatus()), this.getDescription()});
+        return String.join(",", new String[]{
+                String.valueOf(this.getId()),
+                String.valueOf(this.getType()),
+                this.getName(),
+                String.valueOf(this.getStatus()),
+                this.getDescription(),
+                this.getDuration() != null ? String.valueOf(this.getDuration().toMinutes()) : "null",
+                this.getStartTime() != null ? this.getStartTime().toString() : "null"
+        });
     }
 
     public Task fromCsvLine(String[] taskData) {
@@ -54,6 +89,9 @@ public class Task {
         this.setName(taskData[2]);
         this.setStatus(TaskStatus.valueOf(taskData[3]));
         this.setDescription(taskData[4]);
+        this.setDuration("null".equals(taskData[5]) ? null : Duration.ofMinutes(Long.parseLong(taskData[5])));
+        this.setStartTime("null".equals(taskData[6]) ? null : LocalDateTime.parse(taskData[6]));
+
         return this;
     }
 
@@ -76,10 +114,12 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                ", id=" + getId() +
+                "id=" + getId() + '\'' +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
+                ", status=" + getStatus() + '\'' +
+                ", duration=" + getDuration() + '\'' +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }

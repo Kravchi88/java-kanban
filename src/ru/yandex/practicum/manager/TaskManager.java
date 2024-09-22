@@ -5,9 +5,12 @@ import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     List<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
 
     Task createTask(Task task);
 

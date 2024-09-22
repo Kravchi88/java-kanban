@@ -22,7 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,duration,startTime,epicId\n");
             for (Task task : tasks.values()) {
                 writer.write(task.toCsvLine() + "\n");
             }
@@ -58,6 +58,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         manager.epics.get(subtask.getEpicId()).getSubtaskIds().add(subtask.getId());
                     }
                 }
+                manager.updateTree(task, false);
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Error reading from file");

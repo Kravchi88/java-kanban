@@ -62,6 +62,33 @@ class HistoryManagerTest {
         assertNotNull(historyManager.getHistory(), "Search history does not exist");
     }
 
+    @Test
+    void remove_shouldRemoveTasks() {
+        List<Task> expectedTasks = new ArrayList<>();
+
+        Task task = task(1);
+        expectedTasks.add(task);
+        historyManager.add(task);
+
+        Epic epic = epic(2);
+        expectedTasks.add(epic);
+        historyManager.add(epic);
+
+        Subtask subtask = subtask(3, 2);
+        expectedTasks.add(subtask);
+        historyManager.add(subtask);
+
+        expectedTasks.remove(task);
+        historyManager.remove(1);
+
+        assertEquals(expectedTasks, historyManager.getHistory());
+
+        historyManager.remove(2);
+        historyManager.remove(3);
+
+        assertEquals(0, historyManager.getHistory().size());
+    }
+
     private Task task(int id) {
         Task task = new Task();
         task.setId(id);
