@@ -26,36 +26,32 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void shouldSerializeTasks() throws IOException {
-        File expected = new File("test/files/expectedSerialize.csv");
-        File actual = new File("test/files/actualSerialize.csv");
-        FileBackedTaskManager manager = new FileBackedTaskManager("test/files/actualSerialize.csv");
+    void shouldSerializeTasks() {
+        taskManager.createTask(task1());
+        taskManager.createTask(task2());
+        taskManager.createEpic(epic1());
+        taskManager.createSubtask(subtask1());
+        taskManager.createSubtask(subtask2());
+        taskManager.createSubtask(subtask3());
 
-        FileWriter writerExpected = new FileWriter(expected);
-        writerExpected.write("1,TASK,Task1,NEW,Description task1,30,2024-08-31T10:30\n" +
-                "2,EPIC,Epic2,DONE,Description epic2,10,2024-08-31T11:00\n" +
-                "3,SUBTASK,Sub Task2,DONE,Description sub task3,10,2024-08-31T11:00,2");
-        writerExpected.close();
+        taskManager.getTaskById(1);
 
-        FileWriter writerActual = new FileWriter(actual);
-        writerActual.write(task().toCsvLine() + "\n");
-        writerActual.write(epic().toCsvLine() + "\n");
-        writerActual.write(subtask().toCsvLine() + "\n");
-        writerActual.close();
+        taskManager.removeSubtaskById(4);
 
-        StringBuilder expectedString = new StringBuilder();
-        BufferedReader bufferedReaderExpected = new BufferedReader(new FileReader(expected));
-        while (bufferedReaderExpected.ready()) {
-            expectedString.append(bufferedReaderExpected.readLine());
-        }
+        taskManager.updateSubtask(subtask3Upd());
 
-        StringBuilder actualString = new StringBuilder();
-        BufferedReader bufferedReaderActual = new BufferedReader(new FileReader(actual));
-        while (bufferedReaderActual.ready()) {
-            actualString.append(bufferedReaderActual.readLine());
-        }
+        TaskManager newTaskManager = FileBackedTaskManager.loadFromFile(path.toFile());
 
-        assertEquals(expectedString.toString(), actualString.toString());
+        assertEquals(taskManager.getTasks(), newTaskManager.getTasks());
+        assertEquals(taskManager.getEpics(), newTaskManager.getEpics());
+        assertEquals(taskManager.getSubtasks(), newTaskManager.getSubtasks());
+        assertEquals(taskManager.getPrioritizedTasks(), newTaskManager.getPrioritizedTasks());
+
+        /*try (FileOutputStream fos = new FileOutputStream(path.toString())) {
+            // just to clear the file
+        } catch (IOException e) {
+            System.out.println("Failed to clear the file" + e.getMessage());
+        }*/
     }
 
     @Test
@@ -105,5 +101,63 @@ class FileBackedTaskManagerTest {
        subtask.setDuration(Duration.ofMinutes(10));
        subtask.setStartTime(LocalDateTime.of(2024,8, 31, 11,0));
        return subtask;
+    }
+
+    Task task1() {
+        Task task = new Task();
+        task.setStatus(TaskStatus.NEW);
+        task.setDuration(Duration.ofMinutes(30));
+        task.setStartTime(LocalDateTime.of(2024,1, 1, 10, 30));
+        return task;
+    }
+
+    Task task2() {
+        Task task = new Task();
+        task.setStatus(TaskStatus.NEW);
+        task.setDuration(Duration.ofMinutes(60));
+        task.setStartTime(LocalDateTime.of(2024,1, 3, 11, 0));
+        return task;
+    }
+
+    Epic epic1() {
+        Epic epic = new Epic();
+        return epic;
+    }
+
+    Subtask subtask1() {
+        Subtask subtask = new Subtask();
+        subtask.setEpicId(3);
+        subtask.setStatus(TaskStatus.NEW);
+        subtask.setDuration(Duration.ofMinutes(120));
+        subtask.setStartTime(LocalDateTime.of(2024,1, 2, 12, 0));
+        return subtask;
+    }
+
+    Subtask subtask2() {
+        Subtask subtask = new Subtask();
+        subtask.setEpicId(3);
+        subtask.setStatus(TaskStatus.NEW);
+        subtask.setDuration(Duration.ofMinutes(20));
+        subtask.setStartTime(LocalDateTime.of(2024,1, 2, 15, 0));
+        return subtask;
+    }
+
+    Subtask subtask3() {
+        Subtask subtask = new Subtask();
+        subtask.setEpicId(3);
+        subtask.setStatus(TaskStatus.NEW);
+        subtask.setDuration(Duration.ofMinutes(10));
+        subtask.setStartTime(LocalDateTime.of(2024,1, 2, 16, 0));
+        return subtask;
+    }
+
+    Subtask subtask3Upd() {
+        Subtask subtask = new Subtask();
+        subtask.setId(6);
+        subtask.setEpicId(3);
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        subtask.setDuration(Duration.ofMinutes(40));
+        subtask.setStartTime(LocalDateTime.of(2024,1, 2, 16, 0));
+        return subtask;
     }
 }

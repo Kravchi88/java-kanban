@@ -225,7 +225,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task newTask) {
         if (hasTimeConflict(newTask)) {
-            return null;
+            throw new RuntimeException();
         }
         tasks.put(newTask.getId(), newTask);
         updateTree(newTask, false);
@@ -247,7 +247,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask updateSubtask(Subtask newSubtask) {
         if (hasTimeConflict(newSubtask)) {
-            return null;
+            throw new RuntimeException();
         }
         Subtask oldSubtask = subtasks.get(newSubtask.getId());
         newSubtask.setEpicId(oldSubtask.getEpicId());

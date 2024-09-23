@@ -1,1 +1,6 @@
-
+id,type,name,status,description,duration,startTime,epicId
+1,TASK,null,NEW,null,30,2024-01-01T10:30
+2,TASK,null,NEW,null,60,2024-01-03T11:00
+3,EPIC,null,IN_PROGRESS,null,60,2024-01-02T15:00
+5,SUBTASK,null,NEW,null,20,2024-01-02T15:00,3
+6,SUBTASK,null,IN_PROGRESS,null,40,2024-01-02T16:00,3

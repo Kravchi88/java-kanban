@@ -97,18 +97,16 @@ public class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Task task)) {
-            return false;
-        }
-        return getId() == task.getId();
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id && status == task.status
+                && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(id, status, duration, startTime);
     }
 
     @Override
