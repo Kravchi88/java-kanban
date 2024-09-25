@@ -53,6 +53,8 @@ class TaskManagerTest {
 
         Subtask expectedSubtask = new Subtask();
         expectedSubtask.setId(2);
+        expectedSubtask.setEpicId(1);
+        expectedSubtask.setStatus(TaskStatus.NEW);
 
         Subtask actualSubtask = new Subtask();
         actualSubtask.setEpicId(1);
@@ -414,7 +416,11 @@ class TaskManagerTest {
         Task task3 = new Task();
         task3.setDuration(Duration.ofMinutes(60));
         task3.setStartTime(LocalDateTime.of(2024, 1, 1, 13, 59));
-        taskManager.createTask(task3);
+        try {
+            taskManager.createTask(task3);
+        } catch (RuntimeException e) {
+            System.err.println("Error creating task3");
+        }
 
         assertEquals(tasks, taskManager.getTasks());
 
@@ -422,7 +428,11 @@ class TaskManagerTest {
         task2Updated.setId(2);
         task2Updated.setDuration(Duration.ofMinutes(60));
         task2Updated.setStartTime(LocalDateTime.of(2024, 1, 1, 11, 30));
-        taskManager.updateTask(task2Updated);
+        try {
+            taskManager.updateTask(task2Updated);
+        } catch (RuntimeException e) {
+            System.err.println("Error updating task2");
+        }
 
         assertEquals(tasks, taskManager.getTasks());
         assertEquals(LocalDateTime.of(2024, 1, 1, 13, 0), tasks.get(1).getStartTime());
@@ -442,7 +452,11 @@ class TaskManagerTest {
         subtask1.setEpicId(3);
         subtask1.setDuration(Duration.ofMinutes(30));
         subtask1.setStartTime(LocalDateTime.of(2024, 1, 1, 12, 45));
-        taskManager.createSubtask(subtask1);
+        try {
+            taskManager.createSubtask(subtask1);
+        } catch (RuntimeException e) {
+            System.err.println("Error creating subtask1");
+        }
 
         assertNull(epic.getStartTime());
         assertEquals(0, taskManager.getSubtasks().size());

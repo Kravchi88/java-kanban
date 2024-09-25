@@ -77,7 +77,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task createTask(Task task) {
         if (hasTimeConflict(task)) {
-            return null;
+            throw new RuntimeException();
         }
         task.setId(++idSequence);
         tasks.put(idSequence, task);
@@ -99,7 +99,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask createSubtask(Subtask subtask) {
         if (hasTimeConflict(subtask)) {
-            return null;
+            throw new RuntimeException();
         }
         subtask.setId(++idSequence);
         subtasks.put(idSequence, subtask);
