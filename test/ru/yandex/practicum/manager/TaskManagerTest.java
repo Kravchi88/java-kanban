@@ -7,13 +7,12 @@ import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 import ru.yandex.practicum.tasks.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TaskManagerTest {
     private TaskManager taskManager;
@@ -54,6 +53,8 @@ class TaskManagerTest {
 
         Subtask expectedSubtask = new Subtask();
         expectedSubtask.setId(2);
+        expectedSubtask.setEpicId(1);
+        expectedSubtask.setStatus(TaskStatus.NEW);
 
         Subtask actualSubtask = new Subtask();
         actualSubtask.setEpicId(1);
@@ -326,6 +327,145 @@ class TaskManagerTest {
         List<Subtask> actualSubtaskList = taskManager.getSubtasksByEpicId(1);
 
         assertEquals(expectedSubtaskList, actualSubtaskList, "The lists are different");
+    }
+
+    @Test
+    void shouldSetCorrectEpicStatus() {
+        Epic epic = setParametersToEpic("name", "description", new ArrayList<>());
+        taskManager.createEpic(epic);
+
+        Subtask subtask1 = setParametersToSubtask("name", "description", 1, TaskStatus.NEW);
+        taskManager.createSubtask(subtask1);
+
+        Subtask subtask2 = setParametersToSubtask("name", "description", 1, TaskStatus.NEW);
+        taskManager.createSubtask(subtask2);
+
+        Subtask subtask3 = setParametersToSubtask("name", "description", 1, TaskStatus.NEW);
+        taskManager.createSubtask(subtask3);
+
+        assertEquals(TaskStatus.NEW, epic.getStatus());
+
+        subtask1.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask1);
+        subtask2.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask2);
+        subtask3.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask3);
+
+        assertEquals(TaskStatus.DONE, epic.getStatus());
+
+        subtask1.setStatus(TaskStatus.NEW);
+        taskManager.updateSubtask(subtask1);
+
+        assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus());
+
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask1);
+        subtask2.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask2);
+        subtask3.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask3);
+
+        assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus());
+    }
+
+    @Test
+    void shouldSetCorrectTimeToEpic() {
+        Epic epic = new Epic();
+        taskManager.createEpic(epic);
+
+        Subtask subtask1 = new Subtask();
+        subtask1.setEpicId(1);
+        subtask1.setDuration(Duration.ofMinutes(30));
+        subtask1.setStartTime(LocalDateTime.of(2024, 8, 31, 10, 0));
+        taskManager.createSubtask(subtask1);
+
+        Subtask subtask2 = new Subtask();
+        subtask2.setEpicId(1);
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.of(2024, 9, 1, 12, 0));
+        taskManager.createSubtask(subtask2);
+
+        Subtask subtask3 = new Subtask();
+        subtask3.setEpicId(1);
+        subtask3.setDuration(Duration.ofHours(2));
+        subtask3.setStartTime(LocalDateTime.of(2024, 8, 31, 16, 0));
+        taskManager.createSubtask(subtask3);
+
+        assertEquals(Duration.ofMinutes(165), epic.getDuration());
+        assertEquals(LocalDateTime.of(2024, 8, 31, 10, 0), epic.getStartTime());
+        assertEquals(LocalDateTime.of(2024, 9, 1, 12, 15), epic.getEndTime());
+    }
+
+    @Test
+    void shouldNotBeTimeConflicts() {
+        List<Task> tasks = new ArrayList<>();
+
+        Task task1 = new Task();
+        task1.setDuration(Duration.ofMinutes(60));
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 12, 0));
+        taskManager.createTask(task1);
+        tasks.add(task1);
+
+        Task task2 = new Task();
+        task2.setDuration(Duration.ofMinutes(60));
+        task2.setStartTime(LocalDateTime.of(2024, 1, 1, 13, 0));
+        taskManager.createTask(task2);
+        tasks.add(task2);
+
+        Task task3 = new Task();
+        task3.setDuration(Duration.ofMinutes(60));
+        task3.setStartTime(LocalDateTime.of(2024, 1, 1, 13, 59));
+        try {
+            taskManager.createTask(task3);
+        } catch (RuntimeException e) {
+            System.err.println("Error creating task3");
+        }
+
+        assertEquals(tasks, taskManager.getTasks());
+
+        Task task2Updated = new Task();
+        task2Updated.setId(2);
+        task2Updated.setDuration(Duration.ofMinutes(60));
+        task2Updated.setStartTime(LocalDateTime.of(2024, 1, 1, 11, 30));
+        try {
+            taskManager.updateTask(task2Updated);
+        } catch (RuntimeException e) {
+            System.err.println("Error updating task2");
+        }
+
+        assertEquals(tasks, taskManager.getTasks());
+        assertEquals(LocalDateTime.of(2024, 1, 1, 13, 0), tasks.get(1).getStartTime());
+
+        task2Updated.setStartTime(LocalDateTime.of(2024, 1, 1, 13, 30));
+        taskManager.updateTask(task2Updated);
+        tasks.remove(task2);
+        tasks.add(task2Updated);
+
+        assertEquals(tasks, taskManager.getTasks());
+        assertEquals(LocalDateTime.of(2024, 1, 1, 13, 30), tasks.get(1).getStartTime());
+
+        Epic epic = new Epic();
+        taskManager.createEpic(epic);
+
+        Subtask subtask1 = new Subtask();
+        subtask1.setEpicId(3);
+        subtask1.setDuration(Duration.ofMinutes(30));
+        subtask1.setStartTime(LocalDateTime.of(2024, 1, 1, 12, 45));
+        try {
+            taskManager.createSubtask(subtask1);
+        } catch (RuntimeException e) {
+            System.err.println("Error creating subtask1");
+        }
+
+        assertNull(epic.getStartTime());
+        assertEquals(0, taskManager.getSubtasks().size());
+
+        subtask1.setStartTime(LocalDateTime.of(2024, 1, 1, 15, 0));
+        taskManager.createSubtask(subtask1);
+
+        assertEquals(LocalDateTime.of(2024, 1, 1, 15, 0), epic.getStartTime());
+        assertEquals(1, taskManager.getSubtasks().size());
     }
 
     Task setParametersToTask(String name, String description, TaskStatus status) {
