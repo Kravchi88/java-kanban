@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+/*package ru.yandex.practicum;
 
 import ru.yandex.practicum.manager.FileBackedTaskManager;
 import ru.yandex.practicum.tasks.Epic;
@@ -64,4 +64,4 @@ public class Main {
             System.out.println(t);
         }
     }
-}
+}*/
