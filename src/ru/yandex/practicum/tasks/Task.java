@@ -87,7 +87,7 @@ public class Task {
     public Task fromCsvLine(String[] taskData) {
         this.setId(Integer.parseInt(taskData[0]));
         this.setName(taskData[2]);
-        this.setStatus(TaskStatus.valueOf(taskData[3]));
+        this.setStatus("null".equals(taskData[3]) ? null : TaskStatus.valueOf(taskData[3]));
         this.setDescription(taskData[4]);
         this.setDuration("null".equals(taskData[5]) ? null : Duration.ofMinutes(Long.parseLong(taskData[5])));
         this.setStartTime("null".equals(taskData[6]) ? null : LocalDateTime.parse(taskData[6]));

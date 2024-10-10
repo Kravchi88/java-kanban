@@ -1,5 +1,7 @@
 package ru.yandex.practicum.manager;
 
+import ru.yandex.practicum.exceptions.TaskConflictException;
+import ru.yandex.practicum.exceptions.TaskNotFoundException;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -77,7 +79,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task createTask(Task task) {
         if (hasTimeConflict(task)) {
-            throw new RuntimeException();
+            throw new TaskConflictException();
         }
         task.setId(++idSequence);
         tasks.put(idSequence, task);
@@ -99,7 +101,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask createSubtask(Subtask subtask) {
         if (hasTimeConflict(subtask)) {
-            throw new RuntimeException();
+            throw new TaskConflictException();
         }
         subtask.setId(++idSequence);
         subtasks.put(idSequence, subtask);
@@ -116,18 +118,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(int id) {
+        if (!tasks.containsKey(id)) {
+            throw new TaskNotFoundException();
+        }
         historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
+        if (!epics.containsKey(id)) {
+            throw new TaskNotFoundException();
+        }
         historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
+        if (!subtasks.containsKey(id)) {
+            throw new TaskNotFoundException();
+        }
         historyManager.add(subtasks.get(id));
         return subtasks.get(id);
     }
@@ -150,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskById(int id) {
         if (tasks.get(id) == null) {
-            return;
+            throw new TaskNotFoundException();
         }
         updateTree(tasks.get(id), true);
         tasks.remove(id);
@@ -161,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic == null) {
-            return;
+            throw new TaskNotFoundException();
         }
         for (int subtaskId : epic.getSubtaskIds()) {
             updateTree(subtasks.get(subtaskId), true);
@@ -177,7 +188,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         if (subtask == null) {
-            return;
+            throw new TaskNotFoundException();
         }
         Epic epic = epics.get(subtask.getEpicId());
         epic.getSubtaskIds().remove(Integer.valueOf(subtask.getId()));
@@ -224,8 +235,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task updateTask(Task newTask) {
+        if (!tasks.containsKey(newTask.getId())) {
+            throw new TaskNotFoundException();
+        }
         if (hasTimeConflict(newTask)) {
-            throw new RuntimeException();
+            throw new TaskConflictException();
         }
         tasks.put(newTask.getId(), newTask);
         updateTree(newTask, false);
@@ -235,6 +249,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic updateEpic(Epic newEpic) {
+        if (!epics.containsKey(newEpic.getId())) {
+            throw new TaskNotFoundException();
+        }
         Epic oldEpic = epics.get(newEpic.getId());
         newEpic.setSubtaskIds(oldEpic.getSubtaskIds());
         setEpicTimeFields(newEpic);
@@ -246,8 +263,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask updateSubtask(Subtask newSubtask) {
+        if (!subtasks.containsKey(newSubtask.getId())) {
+            throw new TaskNotFoundException();
+        }
         if (hasTimeConflict(newSubtask)) {
-            throw new RuntimeException();
+            throw new TaskConflictException();
         }
         Subtask oldSubtask = subtasks.get(newSubtask.getId());
         newSubtask.setEpicId(oldSubtask.getEpicId());
@@ -265,6 +285,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Subtask> getSubtasksByEpicId(int epicId) {
+        if (!epics.containsKey(epicId)) {
+            throw new TaskNotFoundException();
+        }
         Epic epic = epics.get(epicId);
         List<Integer> subtaskIds = epic.getSubtaskIds();
         return subtasks.values().stream()
