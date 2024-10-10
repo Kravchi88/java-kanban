@@ -1,4 +1,3 @@
-
 package ru.yandex.practicum.handlers;
 
 import com.google.gson.Gson;
@@ -23,9 +22,7 @@ public class BaseHttpHandler implements HttpHandler {
             .create();
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-
-    }
+    public void handle(HttpExchange exchange) throws IOException {}
 
     protected void sendOk(HttpExchange exchange, String data) throws IOException {
         sendResponse(exchange, 200, data);

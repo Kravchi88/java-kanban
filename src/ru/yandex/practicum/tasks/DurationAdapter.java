@@ -18,6 +18,11 @@ public class DurationAdapter extends TypeAdapter<Duration> {
 
     @Override
     public Duration read(JsonReader in) throws IOException {
-        return Duration.parse(in.nextString());
+        if (in.peek() == com.google.gson.stream.JsonToken.NULL) {
+            in.nextNull();
+            return null;
+        } else {
+            return Duration.parse(in.nextString());
+        }
     }
 }
